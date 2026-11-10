@@ -1,0 +1,70 @@
+# 用 npm Trusted Publishing（OIDC）发布，不保存任何长期 token。
+#
+# 前置：在 npm 包设置里配置 Trusted Publisher
+#   https://www.npmjs.com/package/dsh-bt-remote-voice/access
+#   → Trusted publishing → GitHub Actions
+#   → Repository: Retrasts/dsh-bt-remote-voice
+#   → Workflow filename: release.yml
+#   → Environment: （留空）
+#
+# 触发方式：
+#   1) 推 tag：git tag v0.1.0 && git push origin v0.1.0
+#   2) 或在 Actions 页面手动 Run workflow
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '只打包不发布'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write        # OIDC：Trusted Publishing 必需
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+
+      - name: 确认 npm CLI 支持 Trusted Publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
+
+      - name: 安装依赖
+        run: npm ci || npm install
+
+      - name: 语法检查
+        run: npm run check
+
+      - name: 单元与契约测试
+        run: npm test
+
+      - name: ADPCM 解码交叉验证
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          npm run verify:adpcm
+
+      - name: 市场索引校验
+        run: npm run verify:market || echo "（跳过：需要本机 DSH 安装）"
+
+      - name: 打包预览
+        run: npm pack --dry-run
+
+      - name: 发布到 npm（OIDC）
+        if: ${{ github.event_name == 'push' || inputs.dry_run == false }}
+        run: npm publish --provenance --access public

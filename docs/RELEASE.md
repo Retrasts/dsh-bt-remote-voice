@@ -32,17 +32,49 @@ git push -u origin main
 推上去之后 GitHub Actions 会自动跑 `.github/workflows/ci.yml`（Node 20 与 22 两个矩阵，
 含 ADPCM 交叉验证）。
 
-## 3. 发 npm
+## 3. 发 npm —— 用 Trusted Publishing（OIDC）
+
+npm 从 2025 年起禁止"无 2FA 直接 publish"，而长期 automation token 被官方标注为有安全
+风险。推荐路径是 **Trusted Publishing**：发布在 GitHub Actions 里用短期 OIDC 凭证完成，
+仓库里不存任何 token，产物自带 provenance 签名。
+
+### 3.1 在 npm 上配置 Trusted Publisher
+
+1. 打开 https://www.npmjs.com/package/dsh-bt-remote-voice/access
+   （包还没发布时用 pending publisher 入口：
+   https://www.npmjs.com/settings/retrasts/publishing）
+2. Trusted publishing → **GitHub Actions**
+3. 填：
+
+   | 字段 | 值 |
+   |---|---|
+   | Organization or user | `Retrasts` |
+   | Repository | `dsh-bt-remote-voice` |
+   | Workflow filename | `release.yml` |
+   | Environment | 留空 |
+
+### 3.2 触发发布
 
 ```bash
-npm login                      # 需要 npm 账号
-npm whoami                     # 确认登录成功
-./scripts/release.sh publish    # 内部会再跑一遍校验，然后 npm publish --access public
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
-`prepublishOnly` 里挂了 `check + test + verify:adpcm + verify:market`，任何一项不过都不会
-发出去。发布产物是 28 个文件 / 52.2 kB（压缩后），只含 `host.js`、`client.js`、`lib/`、
-`profiles/`、`scripts/`、`docs/`、`cordis.patch.yml`、README、CHANGELOG、LICENSE。
+或在 https://github.com/Retrasts/dsh-bt-remote-voice/actions 里手动 Run workflow。
+workflow 会自己跑：语法 → 22 项测试 → ADPCM 交叉验证 → 市场索引 → 打包预览 →
+`npm publish --provenance --access public`。
+
+### 3.3 本地发布（备用路径，需要 2FA）
+
+如果确实要在本机发，账号必须先启用 2FA，然后：
+
+```bash
+npm login
+./scripts/release.sh publish --otp=123456
+```
+
+`prepublishOnly` 里挂了 `check + test + verify:adpcm + verify:market`，任何一项不过
+都不会发出去。发布产物是 30 个文件 / 53.8 kB。
 
 ## 4. 提交市场索引
 
