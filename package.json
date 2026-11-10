@@ -1,0 +1,82 @@
+{
+  "name": "dsh-bt-remote-voice",
+  "version": "0.1.0",
+  "description": "DSH 插件：把蓝牙语音遥控器（BLE ATVV）变成按住说话的语音输入。语音取自遥控器自己的麦克风，不依赖电脑麦克风。A DSH plugin that turns a BLE voice remote (ATVV) into push-to-talk speech input, using the remote's own microphone.",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "bluetooth",
+    "ble",
+    "atvv",
+    "voice-remote",
+    "push-to-talk",
+    "speech-to-text",
+    "xiaomi",
+    "linux"
+  ],
+  "type": "module",
+  "main": "host.js",
+  "exports": {
+    ".": "./host.js",
+    "./client": "./client.js",
+    "./lib/adpcm": "./lib/adpcm.js",
+    "./lib/atvv": "./lib/atvv.js",
+    "./lib/bluez": "./lib/bluez.js",
+    "./lib/devices": "./lib/devices.js",
+    "./lib/keys": "./lib/keys.js",
+    "./profiles/*": "./profiles/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "host.js",
+    "client.js",
+    "lib",
+    "profiles",
+    "scripts",
+    "docs",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "check": "node --check host.js && node --check client.js",
+    "test": "node --test",
+    "live": "node scripts/live-atvv.mjs",
+    "e2e": "node scripts/e2e-local.mjs",
+    "verify:adpcm": "node scripts/verify-adpcm.mjs",
+    "verify:pipeline": "node scripts/verify-pipeline.mjs",
+    "verify:market": "node scripts/verify-market.mjs",
+    "prepublishOnly": "npm run check && npm test && npm run verify:adpcm && npm run verify:market",
+    "pack:check": "npm pack --dry-run"
+  },
+  "dependencies": {
+    "dbus-next": "^0.10.2"
+  },
+  "license": "MIT",
+  "author": "dsh-bt-remote-voice contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Retrasts/dsh-bt-remote-voice.git"
+  },
+  "homepage": "https://github.com/Retrasts/dsh-bt-remote-voice#readme",
+  "bugs": {
+    "url": "https://github.com/Retrasts/dsh-bt-remote-voice/issues"
+  }
+}

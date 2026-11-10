@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install ffmpeg (用于 ADPCM 交叉验证)
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg python3
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Syntax check
+        run: npm run check
+
+      - name: Unit + contract tests
+        run: npm test
+
+      - name: ADPCM decoder cross-check
+        run: npm run verify:adpcm
+
+      - name: Market index validation
+        run: npm run verify:market
+        continue-on-error: true   # 该脚本需要本机 DSH 安装，CI 上没有
+
+  package:
+    runs-on: ubuntu-24.04
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci || npm install
+      - name: Inspect published tarball
+        run: npm pack --dry-run

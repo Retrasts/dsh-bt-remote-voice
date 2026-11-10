@@ -1,0 +1,54 @@
+{
+  "id": "xiaomi-arn9",
+  "name": {
+    "zh": "小米蓝牙语音遥控器（ARN9 普通款）",
+    "en": "Xiaomi Bluetooth Voice Remote (ARN9)"
+  },
+  "vendor": "Xiaomi",
+  "match": {
+    "bluetoothNames": [
+      "小米蓝牙语音遥控器",
+      "Xiaomi Bluetooth Voice Remote"
+    ],
+    "hid": {
+      "vendorId": 10007,
+      "productId": 12984
+    },
+    "deviceInfoModel": [
+      "ARN9",
+      "RC001"
+    ]
+  },
+  "voice": {
+    "protocol": "atvv",
+    "codec": "ima-adpcm",
+    "sampleRate": 16000,
+    "frameSize": 120,
+    "serviceUuid": "ab5e0001-5a21-4f05-bc7d-af01f617b664",
+    "transmitUuid": "ab5e0002-5a21-4f05-bc7d-af01f617b664",
+    "audioUuid": "ab5e0003-5a21-4f05-bc7d-af01f617b664",
+    "controlUuid": "ab5e0004-5a21-4f05-bc7d-af01f617b664"
+  },
+  "keys": {
+    "voice": [
+      62,
+      63
+    ],
+    "up": 103,
+    "down": 108,
+    "left": 105,
+    "right": 106,
+    "enter": 28,
+    "back": 158,
+    "home": 102,
+    "menu": 127,
+    "volumeUp": 115,
+    "volumeDown": 114,
+    "power": 116
+  },
+  "notes": [
+    "Linux 上必须先禁用 BlueZ 的 HID host 插件（DisablePlugins = input），否则设备会把语音切到厂商加密通道，标准 ATVV 收不到任何音频。",
+    "语音键在 HID 层会上报 KEY_F5 或 KEY_F6，两个码都要拦截，否则浏览器会把它当刷新键。",
+    "本机实测 Device Information 的 Model Number 报的是 RC001（0x2A24），与 ARN9 共用同一套 ATVV 协议，因此并入本 profile。"
+  ]
+}

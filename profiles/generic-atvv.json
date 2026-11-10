@@ -1,0 +1,36 @@
+{
+  "id": "generic-atvv",
+  "name": {
+    "zh": "通用 ATVV 语音遥控器",
+    "en": "Generic ATVV voice remote"
+  },
+  "vendor": "unknown",
+  "match": {
+    "serviceUuids": ["ab5e0001-5a21-4f05-bc7d-af01f617b664"]
+  },
+  "voice": {
+    "protocol": "atvv",
+    "codec": "ima-adpcm",
+    "sampleRate": 16000,
+    "frameSize": 120,
+    "serviceUuid": "ab5e0001-5a21-4f05-bc7d-af01f617b664",
+    "transmitUuid": "ab5e0002-5a21-4f05-bc7d-af01f617b664",
+    "audioUuid": "ab5e0003-5a21-4f05-bc7d-af01f617b664",
+    "controlUuid": "ab5e0004-5a21-4f05-bc7d-af01f617b664"
+  },
+  "keys": {
+    "voice": [62, 63],
+    "up": 103,
+    "down": 108,
+    "left": 105,
+    "right": 106,
+    "enter": 28,
+    "back": 158,
+    "home": 102,
+    "menu": 127
+  },
+  "notes": [
+    "任何暴露标准 ATVV 服务（AB5E0001…）的遥控器都可以用这个 profile：先按能力协商拿到 frameSize 与采样率，再按 IMA ADPCM 解码。",
+    "按键码是 Linux input event code，不同厂商可能不同，可在设置面板里逐键校准。"
+  ]
+}

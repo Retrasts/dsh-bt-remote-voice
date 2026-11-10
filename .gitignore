@@ -1,0 +1,6 @@
+node_modules/
+out/
+*.log
+*.tgz
+package-lock.json
+.DS_Store

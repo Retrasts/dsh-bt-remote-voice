@@ -1,0 +1,8 @@
+# files 白名单已在 package.json 里声明，这里只做双保险
+node_modules/
+out/
+test/
+.github/
+*.log
+*.tgz
+package-lock.json

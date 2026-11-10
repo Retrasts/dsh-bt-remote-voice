@@ -1,0 +1,48 @@
+{
+  "id": "xiaomi-rc003",
+  "name": {
+    "zh": "小米蓝牙遥控器 2 Pro（RC003）",
+    "en": "Xiaomi Bluetooth Remote 2 Pro (RC003)"
+  },
+  "vendor": "Xiaomi",
+  "match": {
+    "bluetoothNames": [
+      "MI RC",
+      "Xiaomi Bluetooth Remote 2 Pro",
+      "小米蓝牙语音遥控器"
+    ],
+    "hid": {
+      "vendorId": 10007,
+      "productId": 12984
+    },
+    "deviceInfoModel": "RC003"
+  },
+  "voice": {
+    "protocol": "atvv",
+    "codec": "ima-adpcm",
+    "sampleRate": 16000,
+    "frameSize": 120,
+    "serviceUuid": "ab5e0001-5a21-4f05-bc7d-af01f617b664",
+    "transmitUuid": "ab5e0002-5a21-4f05-bc7d-af01f617b664",
+    "audioUuid": "ab5e0003-5a21-4f05-bc7d-af01f617b664",
+    "controlUuid": "ab5e0004-5a21-4f05-bc7d-af01f617b664"
+  },
+  "keys": {
+    "voice": [62, 63],
+    "up": 103,
+    "down": 108,
+    "left": 105,
+    "right": 106,
+    "enter": 28,
+    "back": 158,
+    "home": 102,
+    "menu": 127,
+    "tv": 172,
+    "volumeUp": 115,
+    "volumeDown": 114,
+    "power": 116
+  },
+  "notes": [
+    "RC003 与 ARN9 协议完全相同，区别只在实体按键数量与 Device Information 的 Model Number（0x2A24）。"
+  ]
+}

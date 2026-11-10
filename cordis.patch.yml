@@ -1,0 +1,18 @@
+# ============================================================================
+# dsh-bt-remote-voice —— DSH bundle patch（挂载声明）
+# ============================================================================
+# DSH 启动时按 bundle 层栈叠加各插件 patch，本文件把本插件插入 profile 的配置树。
+#
+# 安装：
+#   dsh plugin --profile desktop add dsh-bt-remote-voice
+#   dsh plugin --profile desktop add github:Retrasts/dsh-bt-remote-voice
+#
+# 本地开发（不发布也能装）：
+#   dsh plugin --profile desktop add link:/home/zeiet/文档/deepseek-harness/default-workspace/dsh-bt-remote-voice
+#
+# 注意：`id` 必须与 host.js 导出的 `name` 保持一致，否则服务与日志会错位。
+# ============================================================================
+
+- insert:
+    - id: bt-remote-voice
+      name: dsh-bt-remote-voice

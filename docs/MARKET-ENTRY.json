@@ -1,0 +1,100 @@
+{
+  "format": 1,
+  "title": {
+    "zh": "蓝牙遥控器语音输入",
+    "en": "Bluetooth Remote Voice"
+  },
+  "description": {
+    "zh": "把蓝牙语音遥控器（BLE ATVV）变成按住说话的语音输入。",
+    "en": "Push-to-talk speech input from a BLE voice remote (ATVV)."
+  },
+  "metadata": {
+    "categories": {
+      "input": {
+        "title": {
+          "zh": "输入",
+          "en": "Input"
+        }
+      },
+      "speech": {
+        "title": {
+          "zh": "语音",
+          "en": "Speech"
+        }
+      }
+    },
+    "labels": {
+      "requires-admin": {
+        "title": {
+          "zh": "需要系统权限",
+          "en": "Requires system setup"
+        }
+      },
+      "linux-only": {
+        "title": {
+          "zh": "仅 Linux",
+          "en": "Linux only"
+        }
+      }
+    },
+    "sortKeys": {
+      "stars": {
+        "title": {
+          "zh": "热度",
+          "en": "Popularity"
+        },
+        "order": "desc"
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-bt-remote-voice",
+      "title": {
+        "zh": "蓝牙遥控器语音输入",
+        "en": "Bluetooth Remote Voice"
+      },
+      "description": {
+        "zh": "按住蓝牙语音遥控器的语音键说话，松手后语音直接变成文字进入输入框。语音取自遥控器自己的麦克风（BLE ATVV + IMA ADPCM），不需要电脑麦克风。需要先在 /etc/bluetooth/main.conf 设置 DisablePlugins = input。",
+        "en": "Hold the voice key on a BLE voice remote, speak, release — the audio captured by the remote's own microphone (ATVV + IMA ADPCM) becomes text. No host microphone required. Requires DisablePlugins = input in /etc/bluetooth/main.conf."
+      },
+      "author": "dsh-bt-remote-voice contributors",
+      "homepage": "https://github.com/Retrasts/dsh-bt-remote-voice#readme",
+      "repository": {
+        "url": "https://github.com/Retrasts/dsh-bt-remote-voice"
+      },
+      "metadata": {
+        "category": "input",
+        "keywords": [
+          "bluetooth",
+          "ble",
+          "atvv",
+          "voice",
+          "push-to-talk",
+          "remote",
+          "xiaomi",
+          "speech-to-text"
+        ],
+        "labels": [
+          "requires-admin",
+          "linux-only"
+        ],
+        "sortKeys": {
+          "stars": 0
+        }
+      },
+      "versions": [
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 0,
+          "source": {
+            "type": "npm"
+          },
+          "engines": {
+            "dsh": ">=0.2.2"
+          }
+        }
+      ]
+    }
+  ]
+}
