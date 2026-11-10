@@ -64,7 +64,8 @@
     "verify:pipeline": "node scripts/verify-pipeline.mjs",
     "verify:market": "node scripts/verify-market.mjs",
     "prepublishOnly": "npm run check && npm test && npm run verify:adpcm && npm run verify:market",
-    "pack:check": "npm pack --dry-run"
+    "pack:check": "npm pack --dry-run",
+    "sync:market": "node scripts/sync-market-timestamp.mjs"
   },
   "dependencies": {
     "dbus-next": "^0.10.2"
