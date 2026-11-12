@@ -100,6 +100,7 @@ def write_key(fd, code, value):
 
 def grab(event_name):
     path = event_name if event_name.startswith("/dev/") else os.path.join("/dev/input", event_name)
+    state["path"] = path
     try:
         fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
     except OSError as exc:
@@ -143,7 +144,7 @@ def main():
             if state["forward"]:
                 state["uinput"] = open_uinput()
             state["event"] = fd
-            run_loop(fd)
+            run_loop(fd, state.get('path'))
             emit({"ev": "stopped"})
             fd = None
         elif cmd == "set":
@@ -164,10 +165,28 @@ def main():
             pass
 
 
-def run_loop(fd):
+def run_loop(fd, path=None):
     import time
     last = time.time()
+    last_check = time.time()
+    try:
+        inode = os.stat(path).st_ino if path else None
+    except OSError:
+        inode = None
     while True:
+        # 设备重连后 /dev/input/eventN 会被换成新的 inode，旧 fd 变成 (deleted)。
+        # 这时独占其实已经失效（F5 会漏到桌面），必须退出让上层重新打开。
+        now = time.time()
+        if path and now - last_check > 3:
+            last_check = now
+            try:
+                cur = os.stat(path).st_ino
+            except OSError:
+                emit({"ev": "error", "message": f"设备节点消失: {path}"})
+                break
+            if inode is not None and cur != inode:
+                emit({"ev": "error", "message": f"设备节点已重建（inode {inode} -> {cur}），退出以便重新独占"})
+                break
         r, _, _ = select.select([fd, sys.stdin], [], [], 0.25)
         if sys.stdin in r:
             line = sys.stdin.readline()
