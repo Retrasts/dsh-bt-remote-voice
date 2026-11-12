@@ -65,6 +65,8 @@ const DEFAULT_CONFIG = {
    * 例：python3 /path/to/paraformer-cli.py
    */
   externalAsrCommand: '',
+  /** 连接失败后是否自动重试（设备超时断开、休眠唤醒等场景）。 */
+  autoReconnect: true,
 }
 
 const STATE = {
@@ -335,8 +337,10 @@ export class BridgeRuntime extends EventEmitter {
         this.note('warn', '没有找到遥控器的输入设备节点，按键通道未启用；语音仍可用')
       }
 
+      this.lastError = ''
       this.setState(STATE.READY)
       this.startedAt = Date.now()
+      this.retryCount = 0
       if (!this.heartbeat) {
         this.heartbeat = setInterval(() => {
           if (typeof this.heartbeat.unref === 'function') this.heartbeat.unref()
@@ -350,8 +354,32 @@ export class BridgeRuntime extends EventEmitter {
       this.lastError = String(error?.message ?? error)
       this.setState(STATE.ERROR)
       this.note('error', this.lastError)
+      this.scheduleRetry(config)
       return { ok: false, error: this.lastError }
     }
+  }
+
+  /**
+   * 连接失败后按退避重试。
+   * 实测场景：机器休眠/遥控器超时断开后，BlueZ 里设备还挂着但 Name 为空，
+   * 插件启动那一刻匹配不到 profile；等用户再次唤醒遥控器就好了。没有重试的话
+   * 插件会一直停在 error，而这期间 F5 会漏到浏览器触发页面刷新。
+   */
+  scheduleRetry(config) {
+    if (config.autoReconnect === false) return
+    if (this.retryTimer) return
+    this.retryCount = (this.retryCount ?? 0) + 1
+    if (this.retryCount > 60) {
+      this.note('warn', '自动重连已达上限（60 次），停止重试')
+      return
+    }
+    const delay = Math.min(5000 * this.retryCount, 60_000)
+    this.retryTimer = setTimeout(() => {
+      this.retryTimer = null
+      this.note('debug', `自动重连第 ${this.retryCount} 次`)
+      this.connect(config).catch(() => {})
+    }, delay)
+    if (typeof this.retryTimer.unref === 'function') this.retryTimer.unref()
   }
 
   armSilenceWatch(silenceMs) {
@@ -465,6 +493,7 @@ export class BridgeRuntime extends EventEmitter {
 
   async disconnect() {
     this.disarmSilenceWatch()
+    if (this.retryTimer) { clearTimeout(this.retryTimer); this.retryTimer = null }
     if (this.heartbeat) { clearInterval(this.heartbeat); this.heartbeat = null }
     if (this.channel) {
       this.channel.stop()
