@@ -67,6 +67,12 @@ const DEFAULT_CONFIG = {
   externalAsrCommand: '',
   /** 连接失败后是否自动重试（设备超时断开、休眠唤醒等场景）。 */
   autoReconnect: true,
+  /**
+   * 是否由插件自己独占 evdev 并转发按键。
+   * 如果已经用 systemd 用户服务（scripts/mi-remote-grab.py）常驻独占同一个设备，
+   * 这里要设成 false，否则两个进程会抢 EVIOCGRAB，后启动的那个静默失效。
+   */
+  enableKeyChannel: true,
 }
 
 const STATE = {
@@ -313,7 +319,7 @@ export class BridgeRuntime extends EventEmitter {
 
       // 按键通道
       const voiceKeys = config.voiceKeys?.length ? config.voiceKeys : (this.profile.keys?.voice ?? [62, 63])
-      if (this.inputDevice?.event) {
+      if (this.inputDevice?.event && config.enableKeyChannel !== false) {
         this.channel = new KeyChannel({ python: config.keyHelperCommand ?? 'python3', log: (m) => this.note('debug', m) })
         this.channel.on('key', (msg) => {
           if (msg.voice !== true) return
@@ -333,6 +339,8 @@ export class BridgeRuntime extends EventEmitter {
           voiceKeys,
           forward: config.forwardKeys !== false,
         })
+      } else if (config.enableKeyChannel === false) {
+        this.note('info', '按键通道已关闭（由外部守护进程独占设备）')
       } else {
         this.note('warn', '没有找到遥控器的输入设备节点，按键通道未启用；语音仍可用')
       }
