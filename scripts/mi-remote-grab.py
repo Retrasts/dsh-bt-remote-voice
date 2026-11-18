@@ -152,10 +152,23 @@ def serve(path, ui):
 
 def main():
     log(f"守护启动，目标 MAC {MAC}")
-    ui = open_uinput() if FORWARD else None
-    if FORWARD and ui is None:
-        log("虚拟键盘不可用，按键将不转发（只做拦截）")
+    ui = None
+    if FORWARD:
+        for attempt in range(1, 11):
+            ui = open_uinput()
+            if ui is not None:
+                break
+            # 开机瞬间 udev 的 uaccess ACL 可能还没落到 /dev/uinput 上，等一下重试
+            log(f"虚拟键盘创建失败（第 {attempt} 次），2 秒后重试")
+            time.sleep(2)
+        if ui is None:
+            log("虚拟键盘不可用：按键会被拦截但不转发（设备独占仍然有效）")
     while True:
+        # 运行期间如果 uinput 掉了（例如 ACL 变化），在这里补建
+        if FORWARD and ui is None:
+            ui = open_uinput()
+            if ui is not None:
+                log("虚拟键盘已补建")
         path, name = find_event()
         if path is None:
             time.sleep(2)
